@@ -2763,7 +2763,29 @@ def test_dock_icon_visibility_defaults_on_and_is_saved_by_modern_settings(tmp_pa
 
 
 def test_product_copy_has_no_external_brand_reference():
-    forbidden = ("co" + "dex").lower()
+    """产品文案不引用外部品牌；唯一放行面是对该品牌的 Agent 联动（2026-10-27 口径）。
+
+    本守卫原意：不把外部 AI 编程工具写进产品文案、不拿它当设计出处（见 Q5 视觉调研）。
+    本地派生版新增了对它的 Agent 联动——它成了被联动的对象（与 Claude Code /
+    Cursor / OpenCode 同类），菜单项与功能卡片必须写出它的名字。放行面只有两类：
+
+    1. 联动实现本体：``pet/agent_link/`` 整包、``tests/test_agent_link*.py``、
+       联动协议文档 ``docs/AGENT_LINK_PROTOCOL.md``、该联动的 PR 报告；
+    2. 其它文件里**明确在说这项联动**的行：行内带联动锚点（「<品牌> 联动」、配置键
+       ``agent_link.<品牌>``、映射模块名、监视器类名、测试文件名、PR 报告名）。
+
+    其余位置照旧判红——包括拿它描述界面风格。
+    """
+    forbidden = ("co" + "dex").lower()  # 拆开写：本文件自己也在扫描范围内
+    title = forbidden.capitalize()
+    anchors = tuple(anchor.lower() for anchor in (
+        f"{title} 联动",
+        f"agent_link.{forbidden}",
+        f"{forbidden}_state",
+        f"{title}Monitor",
+        f"test_agent_link_{forbidden}",
+        f"PR-REPORT-{forbidden}-AGENT-LINK",
+    ))
     roots = [Path("pet"), Path("tests"), Path("docs"), Path("README.md")]
     hits = []
     for root in roots:
@@ -2771,19 +2793,26 @@ def test_product_copy_has_no_external_brand_reference():
         for path in paths:
             if not path.is_file() or path.suffix.lower() not in {".py", ".qss", ".md", ".json"}:
                 continue
-            # Competitive research records source names by design; they are
-            # evidence, not user-facing product copy.
+            posix = path.as_posix()
             if (
-                path.name in {"test_agent_link.py"}
-                or path.as_posix().endswith("pet/agent_link/__init__.py")
+                # 联动实现本体：监视器 / 映射 / 协议文档 / 联动测试 / 联动 PR 报告
+                posix.startswith("pet/agent_link/")
+                or path.name.startswith("test_agent_link")
+                or posix == "docs/AGENT_LINK_PROTOCOL.md"
+                or path.name.lower().startswith(f"pr-report-{forbidden}-agent-link")
+                # Competitive research records source names by design; they are
+                # evidence, not user-facing product copy.
                 or path.name.endswith("-RESEARCH.md")
                 # Contributor/change reports are repository evidence, not
                 # user-facing product copy and may mention external brands.
                 or path.name.startswith("README-CHANGE-")
             ):
                 continue
-            if forbidden in path.read_text(encoding="utf-8", errors="ignore").lower():
-                hits.append(str(path))
+            text = path.read_text(encoding="utf-8", errors="ignore")
+            for lineno, line in enumerate(text.splitlines(), 1):
+                lowered = line.lower()
+                if forbidden in lowered and not any(anchor in lowered for anchor in anchors):
+                    hits.append(f"{path}:{lineno}")
     assert hits == []
 
 

@@ -92,10 +92,11 @@ recovery
 | 键 | `agent_link.codex`（`_default_agent_link_data` 默认 `False`，`_clean_agent_link_data` 按布尔清洗）。`agent_link` 是 `tests/test_config_schema.py` 的 `SPECIAL_CASED_KEYS`，顶层快照不变 |
 | 作用域 | 全局（主 `config.json`），与其它 Agent 开关一致；不进 `PER_PET_KEYS` |
 | 归属 | 功能模块 `agent_link`（`features.py` 的 `config_keys` 登记 `agent_link.codex`）；不是新模块，`MIGRATION_BASELINE` 不动 |
-| 迁移 | 新键，老配置缺省 → 关。`codex` 成为内置键后，`custom_agents` 里同名 `key="codex"` 的自定义条目按既有规则被丢弃（自定义条目本就不得与内置键重名） |
-| 依赖 / 外部写入 | 开启不弹授权框、不写任何外部文件：只读 `$CODEX_HOME/thread_history_1.sqlite`。库不存在时开启会气泡提示路径 |
-| 设置页 | 无新行；「专属文案」下拉随 `AgentLinkManager.AGENT_NAMES` 多出「Codex 专属文案」一项 |
-| 平台 | 无平台分支（路径与 sqlite 均为标准库）；实机只验了 Windows + Codex Desktop |
+| 迁移 | 新键，老配置缺省 → 关。Codex 联动占用内置键 `codex` 后，`custom_agents` 里同名 `key="codex"` 的自定义条目按既有规则被丢弃（自定义条目本就不得与内置键重名） |
+| 依赖 / 外部写入 | Codex 联动开启时不弹授权框、不写任何外部文件：只读 `$CODEX_HOME/thread_history_1.sqlite`。库不存在时开启会气泡提示路径 |
+| 设置页 | 无新行；「专属文案」下拉随 `AgentLinkManager.AGENT_NAMES` 多出 Codex 联动的专属文案一项 |
+| 平台 | 无平台分支（路径与 sqlite 均为标准库）；Codex 联动实机只验了 Windows 桌面版 |
+| 品牌词守卫 | `tests/test_desktop_pet_features.py::test_product_copy_has_no_external_brand_reference` 原本禁止任何位置出现该品牌名。Codex 联动必须写出它（菜单项与功能卡片），守卫改为：联动实现本体（`pet/agent_link/`、`tests/test_agent_link*.py`、`docs/AGENT_LINK_PROTOCOL.md`）整文件放行，其它文件只放行带联动锚点（「Codex 联动」/ `agent_link.codex` / 映射模块名等）的行，其余位置照旧判红 |
 
 准出：契约见上表；TDD 见 `tests/test_agent_link_codex.py`；布局无改动；跨平台无新分支；交付证据见 `docs/PR-REPORT-CODEX-AGENT-LINK-2026-10-26.md`。
 

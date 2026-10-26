@@ -12,6 +12,7 @@ from typing import Any
 import shiboken6
 
 from . import feature_activation
+from .config import _AGENT_LINK_BUILTIN_KEYS
 from .window_effects import (
     begin_rotation,
     end_rotation,
@@ -73,7 +74,9 @@ class WindowFeatureGateMixin:
         raw = self.cfg.get("agent_link", {})
         if not isinstance(raw, dict):
             return False
-        for key in ("dsh", "claude", "cursor", "opencode", "codex"):
+        # 内置键唯一来源是 config._AGENT_LINK_BUILTIN_KEYS：这里手抄一份的话，
+        # 新增内置 Agent 时漏改就会出现「只开新 Agent，管理器根本不建」
+        for key in _AGENT_LINK_BUILTIN_KEYS:
             if bool(raw.get(key, False)):
                 return True
         return bool(raw.get("custom_agents"))

@@ -452,9 +452,9 @@ FEATURES: dict[str, FeatureSpec] = {
     "agent_link": FeatureSpec(
         id="agent_link",
         name="Agent 联动",
-        desc="把 DSH、Claude Code、Cursor、OpenCode、Codex 的工作进度接到桌宠身上。",
+        desc="把 DSH、Claude Code、Cursor、OpenCode、Codex 的工作进度接到桌宠身上。",  # 末项 = Codex 联动
         category=CATEGORY_LINK,
-        search_aliases=("Agent", "联动", "DSH", "Claude", "Cursor", "OpenCode", "Codex", "harness"),
+        search_aliases=("Agent", "联动", "DSH", "Claude", "Cursor", "OpenCode", "Codex", "harness"),  # 含 Codex 联动
         requires=(),
         optional_deps=(),
         menu_action_ids=("agent_link", "agent_cost"),

@@ -262,8 +262,7 @@ def _default_agent_link_data() -> dict:
         "claude": False,
         "cursor": False,
         "opencode": False,
-        # Codex（Desktop）：只读 ~/.codex/thread_history_1.sqlite，不改 Codex 配置
-        "codex": False,
+        "codex": False,  # Codex 联动：只读 ~/.codex/thread_history_1.sqlite，不改其配置
         # 自定义联动 Agent（协议见 docs/AGENT_LINK_PROTOCOL.md §4）：只读监听
         # 用户指定的事件文件，不写外部配置、无需授权弹窗，默认空
         "custom_agents": [],
@@ -302,8 +301,9 @@ def _clean_click_sound_pack(value: Any) -> dict:
     }
 
 
-# 内置联动 Agent 键：custom_agents 的 key 不得与之重复
-_AGENT_LINK_BUILTIN_KEYS = ("dsh", "claude", "cursor", "opencode", "codex")
+# 内置联动 Agent 键：custom_agents 的 key 不得与之重复（也是 window_optional_services
+# 判断「要不要建联动管理器」的唯一来源）
+_AGENT_LINK_BUILTIN_KEYS = ("dsh", "claude", "cursor", "opencode", "codex")  # 末位 = Codex 联动
 # 自定义联动 Agent 条目上限（防配置文件被塞爆）
 _CUSTOM_AGENT_MAX = 8
 
@@ -369,7 +369,7 @@ def _clean_agent_link_data(raw: Any) -> dict:
         "claude",
         "cursor",
         "opencode",
-        "codex",
+        "codex",  # Codex 联动
         "sound_enabled",
         "sound_start_enabled",
         "sound_done_enabled",

@@ -821,7 +821,7 @@ def add_agent_link_menu(menu: QMenu, pet) -> None:
         ('claude', 'Claude Code'),
         ('cursor', 'Cursor'),
         ('opencode', 'OpenCode'),
-        ('codex', 'Codex'),
+        ('codex', 'Codex'),  # Codex 联动：只读本机任务记录，开启不弹授权框
     ):
         act = sub.addAction(agent_label)
         act.setCheckable(True)
