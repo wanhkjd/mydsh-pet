@@ -196,15 +196,17 @@ jobs:
       # 手动要上传必须显式打开 upload_artifacts——即使把运行 ref 选到某个已有
       # tag 上手动跑也一样（github.ref 在那里同样带 refs/tags/ 前缀，所以条件
       # 必须先要求 event_name == 'push'，不能只看 ref 前缀）。
+      # 本地派生仓库（2026-10-26）：只上传 Chat 便携版一个文件（约 350 MB）。四个
+      # 文件打成一个 artifact 约 1.3 GB，下载慢、占盘，私有仓库还会超出免费的
+      # 500 MB 产物存储额度；安装包与无 Chat 变体仍由下面的 Release 步骤在 tag 推送时发布。
       - name: Upload artifact
         if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || github.event.inputs.upload_artifacts == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: dsh-pet-standalone-windows-x86_64
-          path: |
-            dist-onedir/*-portable.zip
-            dist-onedir/*-setup.exe
-          retention-days: 30
+          name: dsh-pet-standalone-webm-chat-portable
+          path: dist-onedir/dsh-pet-standalone-webm-chat-portable.zip
+          if-no-files-found: error
+          retention-days: 7
 
       # 只有 tag 推送才发布 Release：手动 dispatch 是验证用途，即使把 ref 指到
       # 某个 tag 上手动跑，也不许创建/改写 Release。

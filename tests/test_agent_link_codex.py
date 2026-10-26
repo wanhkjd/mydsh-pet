@@ -503,8 +503,9 @@ class TestCodexWiring:
 
         QApplication.instance() or QApplication([])
         cfg = Config(base=tmp_path)
-        cfg.data["agent_link"]["codex"] = True
+        # 先建管理器再开开关：构造时 apply_config 不会真的起监视器线程去读本机 Codex 库
         mgr = AgentLinkManager(None, cfg)
+        cfg.data["agent_link"]["codex"] = True
         try:
             mgr._last_raw["codex"] = "working"
             assert mgr.busy_agent_owns_process("Codex.exe") is True
@@ -543,8 +544,12 @@ class TestCodexWiring:
 
             shiboken6.delete(menu)
 
-    def test_codex_alone_wakes_the_agent_link_manager(self):
+    def test_codex_alone_wakes_the_agent_link_manager(self, monkeypatch):
+        from pet import feature_activation
         from pet.window_optional_services import WindowFeatureGateMixin
+
+        # 激活快照是进程级全局：钉成「未冻结」，不受其它用例残留的快照影响
+        monkeypatch.setattr(feature_activation, "_snapshot", None)
 
         class Host(WindowFeatureGateMixin):
             def __init__(self, data):
